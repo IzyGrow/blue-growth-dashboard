@@ -330,16 +330,30 @@ export default function CustomerDashboard() {
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="space-y-3">
-                  <h4 className="font-semibold">Paket İçeriği:</h4>
-                  <ul className="space-y-2">
-                    {subscriptionInfo.features.map((feature, index) => (
-                      <li key={index} className="flex items-center gap-2">
-                        <CheckCircle className="h-4 w-4 text-success" />
-                        {feature}
-                      </li>
-                    ))}
-                  </ul>
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                  {/* Paket İçeriği */}
+                  <div className="space-y-3">
+                    <h4 className="font-semibold">Paket İçeriği:</h4>
+                    <ul className="space-y-2">
+                      {subscriptionInfo.features.map((feature, index) => (
+                        <li key={index} className="flex items-center gap-2">
+                          <CheckCircle className="h-4 w-4 text-success" />
+                          {feature}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                  
+                  {/* Custom Geliştirme */}
+                  <div className="space-y-3">
+                    <h4 className="font-semibold">Custom Geliştirme</h4>
+                    <div className="p-4 bg-muted/30 rounded-lg">
+                      <h5 className="font-medium mb-2">Anlaşılan Geliştirme</h5>
+                      <p className="text-sm text-muted-foreground">
+                        (sözleşmede ek A olarak eklenmiştir)
+                      </p>
+                    </div>
+                  </div>
                 </div>
               </CardContent>
             </Card>
