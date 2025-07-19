@@ -120,7 +120,7 @@ export default function CustomerDashboard() {
       "7/24 destek",
       "Detaylı Analiz"
     ],
-    startDate: "15 Ocak 2024",
+    startDate: "18.07.2025",
     duration: "12 Ay"
   };
 
