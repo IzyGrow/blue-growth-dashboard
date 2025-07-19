@@ -106,13 +106,19 @@ export default function CustomerDashboard() {
 
   // Mock data - Bu veriler elle yüklenecek
   const subscriptionInfo = {
-    packageName: "Premium Dijital Pazarlama Paketi",
+    customerName: "İntime Mimarlık",
+    packageName: "Growth Paket",
     features: [
-      "Sosyal Medya Yönetimi",
-      "E-ticaret Optimizasyonu", 
-      "SEO ve İçerik Pazarlama",
-      "Email Marketing",
-      "Performans Analizi"
+      "Profesyonel ve Dinamik web sitesi",
+      "Sosyal medya yönetimi", 
+      "Aylık ve haftalık planlama",
+      "E-ticaret entegrasyonu",
+      "Meta reklam yönetimi",
+      "Blog yönetimi",
+      "Whatsapp reklam",
+      "Funnel ve Mesaj Yönetimi",
+      "7/24 destek",
+      "Detaylı Analiz"
     ],
     startDate: "15 Ocak 2024",
     duration: "12 Ay"
@@ -201,8 +207,22 @@ export default function CustomerDashboard() {
         {/* Header */}
         <div className="mb-8">
           <div className="bg-gradient-primary text-white p-6 rounded-lg shadow-elegant">
-            <h1 className="text-3xl font-bold mb-2">Müşteri Bilgilendirme Sistemi</h1>
-            <p className="text-primary-foreground/90">İzygrow Dijital Pazarlama Hizmetleri</p>
+            <div className="flex items-center justify-between">
+              <div>
+                <h1 className="text-3xl font-bold mb-2">Müşteri Bilgilendirme Sistemi</h1>
+                <p className="text-primary-foreground/90">
+                  {subscriptionInfo.customerName} tarafından açılmıştır
+                </p>
+                <p className="text-primary-foreground/70 text-sm">İzygrow Dijital Pazarlama Hizmetleri</p>
+              </div>
+              <div className="hidden md:block">
+                <img 
+                  src="/lovable-uploads/c32f5373-5237-4023-9578-112741e0faa8.png" 
+                  alt="İntime Mimarlık Logo" 
+                  className="h-16 w-auto"
+                />
+              </div>
+            </div>
           </div>
         </div>
 
