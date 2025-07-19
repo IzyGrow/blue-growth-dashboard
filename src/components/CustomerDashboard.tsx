@@ -121,7 +121,7 @@ export default function CustomerDashboard() {
       "Detaylı Analiz"
     ],
     startDate: "18.07.2025",
-    duration: "12 Ay"
+    
   };
 
   const analysisItems: ProjectSection[] = [
@@ -292,7 +292,7 @@ export default function CustomerDashboard() {
                   {subscriptionInfo.packageName}
                 </CardTitle>
                 <CardDescription>
-                  Başlangıç: {subscriptionInfo.startDate} | Süre: {subscriptionInfo.duration}
+                  Başlangıç: {subscriptionInfo.startDate}
                 </CardDescription>
               </CardHeader>
               <CardContent>
