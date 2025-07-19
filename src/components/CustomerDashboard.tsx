@@ -48,6 +48,62 @@ export default function CustomerDashboard() {
   const [activeTab, setActiveTab] = useState('ozet');
   const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>({});
 
+  // Faaliyet Raporu Verileri
+  const activityReport = {
+    socialMedia: {
+      title: "Sosyal Medya Hedefleri",
+      monthly: {
+        target: 500,
+        achieved: 420,
+        status: "İyi gidiyor"
+      },
+      overall: {
+        startValue: 1200,
+        currentValue: 2450,
+        growth: 104
+      }
+    },
+    website: {
+      title: "Web Sitesi Performansı", 
+      monthly: {
+        target: 2000,
+        achieved: 1850,
+        status: "Hedefe yakın"
+      },
+      overall: {
+        startValue: 800,
+        currentValue: 2450,
+        growth: 206
+      }
+    },
+    conversion: {
+      title: "Dönüşüm Oranları",
+      monthly: {
+        target: 4.0,
+        achieved: 3.2,
+        status: "Gelişim gerekli"
+      },
+      overall: {
+        startValue: 1.8,
+        currentValue: 3.2,
+        growth: 78
+      }
+    },
+    email: {
+      title: "E-mail Marketing",
+      monthly: {
+        target: 25.0,
+        achieved: 22.5,
+        status: "İyi seviyede"
+      },
+      overall: {
+        startValue: 15.2,
+        currentValue: 22.5,
+        growth: 48
+      }
+    }
+  };
+
   // Mock data - Bu veriler elle yüklenecek
   const subscriptionInfo = {
     packageName: "Premium Dijital Pazarlama Paketi",
@@ -151,13 +207,13 @@ export default function CustomerDashboard() {
         </div>
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-          <TabsList className="grid w-full grid-cols-5 lg:w-fit lg:grid-cols-5">
+          <TabsList className="grid w-full grid-cols-6 lg:w-fit lg:grid-cols-6">
             <TabsTrigger value="ozet">Özet</TabsTrigger>
             <TabsTrigger value="abonelik">Abonelik</TabsTrigger>
             <TabsTrigger value="analiz">Analiz</TabsTrigger>
             <TabsTrigger value="planlama">Planlama</TabsTrigger>
             <TabsTrigger value="uygulama">Uygulama</TabsTrigger>
-            <TabsTrigger value="performans">Performans</TabsTrigger>
+            <TabsTrigger value="performans-iyilestirme">Performans ve İyileştirme</TabsTrigger>
           </TabsList>
 
           {/* Özet Tab */}
@@ -354,39 +410,134 @@ export default function CustomerDashboard() {
             </Card>
           </TabsContent>
 
-          {/* Performans Tab */}
-          <TabsContent value="performans" className="space-y-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {kpiData.map((kpi, index) => (
-                <Card key={index} className="bg-gradient-card border-0 shadow-elegant">
+          {/* Performans ve İyileştirme Tab - Faaliyet Raporu */}
+          <TabsContent value="performans-iyilestirme" className="space-y-6">
+            <Card className="bg-gradient-card border-0 shadow-elegant">
+              <CardHeader>
+                <CardTitle className="text-2xl">Faaliyet Raporu</CardTitle>
+                <CardDescription>Tüm bölümlerdeki çalışmaların müşteriye yansımaları</CardDescription>
+              </CardHeader>
+            </Card>
+
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              {Object.entries(activityReport).map(([key, section]) => (
+                <Card key={key} className="bg-gradient-card border-0 shadow-elegant">
                   <CardHeader>
-                    <CardTitle className="text-lg flex items-center justify-between">
-                      {kpi.name}
-                      {getTrendIcon(kpi.trend)}
-                    </CardTitle>
+                    <CardTitle className="text-lg">{section.title}</CardTitle>
                   </CardHeader>
-                  <CardContent>
-                    <div className="space-y-4">
-                      <div className="flex justify-between text-sm">
-                        <span>Mevcut</span>
-                        <span className="font-semibold">{kpi.currentValue.toLocaleString()} {kpi.unit}</span>
+                  <CardContent className="space-y-6">
+                    {/* Aylık Performans */}
+                    <div className="space-y-3">
+                      <h4 className="font-semibold text-primary">Bu Ay</h4>
+                      <div className="bg-muted p-4 rounded-lg">
+                        <div className="flex justify-between items-center mb-2">
+                          <span className="text-sm">Hedef:</span>
+                          <span className="font-semibold">{section.monthly.target.toLocaleString()}</span>
+                        </div>
+                        <div className="flex justify-between items-center mb-2">
+                          <span className="text-sm">Gerçekleşme:</span>
+                          <span className="font-semibold">{section.monthly.achieved.toLocaleString()}</span>
+                        </div>
+                        <div className="flex justify-between items-center mb-3">
+                          <span className="text-sm">Durum:</span>
+                          <Badge 
+                            className={cn(
+                              section.monthly.status === "İyi gidiyor" ? "bg-success text-white" :
+                              section.monthly.status === "Hedefe yakın" ? "bg-info text-white" :
+                              section.monthly.status === "İyi seviyede" ? "bg-accent text-white" :
+                              "bg-warning text-white"
+                            )}
+                          >
+                            {section.monthly.status}
+                          </Badge>
+                        </div>
+                        <Progress 
+                          value={(section.monthly.achieved / section.monthly.target) * 100} 
+                          className="h-2"
+                        />
+                        <div className="text-center text-xs text-muted-foreground mt-1">
+                          %{Math.round((section.monthly.achieved / section.monthly.target) * 100)} tamamlandı
+                        </div>
                       </div>
-                      <div className="flex justify-between text-sm">
-                        <span>Hedef</span>
-                        <span className="font-semibold">{kpi.targetValue.toLocaleString()} {kpi.unit}</span>
-                      </div>
-                      <Progress 
-                        value={Math.min((kpi.currentValue / kpi.targetValue) * 100, 100)} 
-                        className="h-3"
-                      />
-                      <div className="text-center text-sm text-muted-foreground">
-                        {Math.round((kpi.currentValue / kpi.targetValue) * 100)}% tamamlandı
+                    </div>
+
+                    {/* Başlangıçtan Bu Yana */}
+                    <div className="space-y-3">
+                      <h4 className="font-semibold text-primary">Başlangıçtan Bu Yana</h4>
+                      <div className="bg-secondary/20 p-4 rounded-lg">
+                        <div className="flex justify-between items-center mb-2">
+                          <span className="text-sm">Başlangıç:</span>
+                          <span className="font-semibold">{section.overall.startValue.toLocaleString()}</span>
+                        </div>
+                        <div className="flex justify-between items-center mb-2">
+                          <span className="text-sm">Şu Anki Durum:</span>
+                          <span className="font-semibold">{section.overall.currentValue.toLocaleString()}</span>
+                        </div>
+                        <div className="flex justify-between items-center mb-3">
+                          <span className="text-sm">Büyüme:</span>
+                          <div className="flex items-center gap-1">
+                            <TrendingUp className="h-4 w-4 text-success" />
+                            <span className="font-semibold text-success">%{section.overall.growth}</span>
+                          </div>
+                        </div>
+                        <div className="h-2 bg-muted rounded-full overflow-hidden">
+                          <div 
+                            className="h-full bg-gradient-primary transition-all duration-500"
+                            style={{ width: `${Math.min(section.overall.growth, 100)}%` }}
+                          />
+                        </div>
                       </div>
                     </div>
                   </CardContent>
                 </Card>
               ))}
             </div>
+
+            {/* Özet Tablo */}
+            <Card className="bg-gradient-card border-0 shadow-elegant">
+              <CardHeader>
+                <CardTitle>Genel Performans Özeti</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="overflow-x-auto">
+                  <table className="w-full text-sm">
+                    <thead>
+                      <tr className="border-b">
+                        <th className="text-left p-2">Kategori</th>
+                        <th className="text-center p-2">Aylık Başarı</th>
+                        <th className="text-center p-2">Genel Büyüme</th>
+                        <th className="text-center p-2">Durum</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {Object.entries(activityReport).map(([key, section]) => (
+                        <tr key={key} className="border-b">
+                          <td className="p-2 font-medium">{section.title}</td>
+                          <td className="text-center p-2">
+                            %{Math.round((section.monthly.achieved / section.monthly.target) * 100)}
+                          </td>
+                          <td className="text-center p-2 text-success font-semibold">
+                            %{section.overall.growth}
+                          </td>
+                          <td className="text-center p-2">
+                            <Badge 
+                              className={cn(
+                                section.monthly.status === "İyi gidiyor" ? "bg-success text-white" :
+                                section.monthly.status === "Hedefe yakın" ? "bg-info text-white" :
+                                section.monthly.status === "İyi seviyede" ? "bg-accent text-white" :
+                                "bg-warning text-white"
+                              )}
+                            >
+                              {section.monthly.status}
+                            </Badge>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </CardContent>
+            </Card>
           </TabsContent>
         </Tabs>
       </div>
