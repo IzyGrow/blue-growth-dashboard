@@ -166,10 +166,20 @@ export default function CustomerDashboard() {
   ];
 
   const kpiData: KPIItem[] = [
+    { name: 'Satış Yapılan Firma Sayısı', currentValue: 15, targetValue: 25, unit: 'firma', trend: 'up' },
     { name: 'Website Ziyareti', currentValue: 2450, targetValue: 3000, unit: 'ziyaret', trend: 'up' },
     { name: 'Sosyal Medya Takipçi', currentValue: 1250, targetValue: 2000, unit: 'takipçi', trend: 'up' },
     { name: 'Dönüşüm Oranı', currentValue: 3.2, targetValue: 5.0, unit: '%', trend: 'up' },
     { name: 'Email Açılma Oranı', currentValue: 22.5, targetValue: 25.0, unit: '%', trend: 'stable' }
+  ];
+
+  // Ülke bazında satış artışı verileri
+  const countrySalesData = [
+    { country: 'Türkiye', growth: 45, currentSales: 8, color: 'bg-red-500' },
+    { country: 'İngiltere', growth: 22, currentSales: 3, color: 'bg-blue-500' },
+    { country: 'Dubai', growth: 18, currentSales: 2, color: 'bg-green-500' },
+    { country: 'Rusya', growth: 12, currentSales: 1, color: 'bg-purple-500' },
+    { country: 'Almanya', growth: 8, currentSales: 1, color: 'bg-orange-500' }
   ];
 
   const toggleSection = (sectionId: string) => {
@@ -258,6 +268,30 @@ export default function CustomerDashboard() {
                 </Card>
               ))}
             </div>
+
+            {/* Ülke Bazında Satış Artışı */}
+            <Card className="bg-gradient-card border-0 shadow-elegant">
+              <CardHeader>
+                <CardTitle>Ülke Bazında Satış Artışı</CardTitle>
+                <CardDescription>Hedef ülkelerdeki satış performansı</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  {countrySalesData.map((country, index) => (
+                    <div key={index} className="flex items-center justify-between p-3 bg-muted/30 rounded-lg">
+                      <div className="flex items-center gap-3">
+                        <div className={`w-3 h-3 rounded-full ${country.color}`}></div>
+                        <span className="font-medium">{country.country}</span>
+                      </div>
+                      <div className="text-right">
+                        <div className="font-semibold">{country.currentSales} firma</div>
+                        <div className="text-sm text-success">+%{country.growth}</div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
 
             <Card className="bg-gradient-card border-0 shadow-elegant">
               <CardHeader>
