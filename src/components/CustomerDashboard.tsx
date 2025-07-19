@@ -14,8 +14,11 @@ import {
   CheckCircle,
   AlertCircle,
   TrendingUp,
-  Package
+  Package,
+  Plus,
+  Target
 } from 'lucide-react';
+import { Input } from "@/components/ui/input";
 import { cn } from '@/lib/utils';
 
 interface FileItem {
@@ -125,7 +128,8 @@ export default function CustomerDashboard() {
   };
 
   const analysisItems: ProjectSection[] = [
-    { id: 'swot', title: 'SWOT Analizi', isExpanded: false, files: [], status: 'in-progress', startDate: '15 Ocak 2024', estimatedEndDate: '25 Ocak 2024' },
+    { id: 'goals', title: 'Hedefler Tablosu', isExpanded: false, files: [], status: 'in-progress' },
+    { id: 'swot', title: 'SWOT Analizi', isExpanded: false, files: [], status: 'in-progress', startDate: '19.07.2025', estimatedEndDate: '25.07.2025' },
     { id: 'brand', title: 'Marka Analizi', isExpanded: false, files: [], status: 'not-started' },
     { id: 'target', title: 'Hedef Kitle Analizi', isExpanded: false, files: [], status: 'not-started' },
     { id: 'competitor', title: 'Rakip Analizi', isExpanded: false, files: [], status: 'not-started' },
@@ -133,6 +137,51 @@ export default function CustomerDashboard() {
     { id: 'social', title: 'Sosyal Medya Analizi', isExpanded: false, files: [], status: 'not-started' },
     { id: 'trendyol', title: 'Trendyol Analizi', isExpanded: false, files: [], status: 'not-started' }
   ];
+
+  // SWOT Analizi için state'ler
+  const [swotData, setSwotData] = useState({
+    strengths: [''],
+    weaknesses: [''],
+    opportunities: [''],
+    threats: [''],
+    soActions: [''],
+    stActions: ['']
+  });
+
+  // Hedefler için state'ler  
+  const [goalsData, setGoalsData] = useState({
+    shortTerm: [''],
+    mediumTerm: [''],
+    longTerm: ['']
+  });
+
+  const addSwotItem = (category: keyof typeof swotData) => {
+    setSwotData(prev => ({
+      ...prev,
+      [category]: [...prev[category], '']
+    }));
+  };
+
+  const updateSwotItem = (category: keyof typeof swotData, index: number, value: string) => {
+    setSwotData(prev => ({
+      ...prev,
+      [category]: prev[category].map((item, i) => i === index ? value : item)
+    }));
+  };
+
+  const addGoalItem = (category: keyof typeof goalsData) => {
+    setGoalsData(prev => ({
+      ...prev,
+      [category]: [...prev[category], '']
+    }));
+  };
+
+  const updateGoalItem = (category: keyof typeof goalsData, index: number, value: string) => {
+    setGoalsData(prev => ({
+      ...prev,
+      [category]: prev[category].map((item, i) => i === index ? value : item)
+    }));
+  };
 
   const planningItems = [
     {
@@ -381,7 +430,271 @@ export default function CustomerDashboard() {
                 
                 {expandedSections[item.id] && (
                   <CardContent>
-                    {item.files.length === 0 ? (
+                    {/* Hedefler Tablosu */}
+                    {item.id === 'goals' && (
+                      <div className="space-y-6">
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                          {/* Kısa Vadeli Hedefler */}
+                          <div className="space-y-3">
+                            <div className="flex items-center gap-2">
+                              <Target className="h-4 w-4 text-primary" />
+                              <h4 className="font-semibold">Kısa Vadeli</h4>
+                            </div>
+                            <div className="space-y-2">
+                              {goalsData.shortTerm.map((goal, index) => (
+                                <Input
+                                  key={index}
+                                  value={goal}
+                                  onChange={(e) => updateGoalItem('shortTerm', index, e.target.value)}
+                                  placeholder="Kısa vadeli hedef girin..."
+                                  className="text-sm"
+                                />
+                              ))}
+                              <Button 
+                                onClick={() => addGoalItem('shortTerm')} 
+                                variant="outline" 
+                                size="sm"
+                                className="w-full"
+                              >
+                                <Plus className="h-4 w-4 mr-2" />
+                                Ekle
+                              </Button>
+                            </div>
+                          </div>
+
+                          {/* Orta Vadeli Hedefler */}
+                          <div className="space-y-3">
+                            <div className="flex items-center gap-2">
+                              <Target className="h-4 w-4 text-primary" />
+                              <h4 className="font-semibold">Orta Vadeli</h4>
+                            </div>
+                            <div className="space-y-2">
+                              {goalsData.mediumTerm.map((goal, index) => (
+                                <Input
+                                  key={index}
+                                  value={goal}
+                                  onChange={(e) => updateGoalItem('mediumTerm', index, e.target.value)}
+                                  placeholder="Orta vadeli hedef girin..."
+                                  className="text-sm"
+                                />
+                              ))}
+                              <Button 
+                                onClick={() => addGoalItem('mediumTerm')} 
+                                variant="outline" 
+                                size="sm"
+                                className="w-full"
+                              >
+                                <Plus className="h-4 w-4 mr-2" />
+                                Ekle
+                              </Button>
+                            </div>
+                          </div>
+
+                          {/* Uzun Vadeli Hedefler */}
+                          <div className="space-y-3">
+                            <div className="flex items-center gap-2">
+                              <Target className="h-4 w-4 text-primary" />
+                              <h4 className="font-semibold">Uzun Vadeli</h4>
+                            </div>
+                            <div className="space-y-2">
+                              {goalsData.longTerm.map((goal, index) => (
+                                <Input
+                                  key={index}
+                                  value={goal}
+                                  onChange={(e) => updateGoalItem('longTerm', index, e.target.value)}
+                                  placeholder="Uzun vadeli hedef girin..."
+                                  className="text-sm"
+                                />
+                              ))}
+                              <Button 
+                                onClick={() => addGoalItem('longTerm')} 
+                                variant="outline" 
+                                size="sm"
+                                className="w-full"
+                              >
+                                <Plus className="h-4 w-4 mr-2" />
+                                Ekle
+                              </Button>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* SWOT Analizi */}
+                    {item.id === 'swot' && (
+                      <div className="space-y-6">
+                        <div className="flex items-center justify-center gap-4 mb-4">
+                          <div className="flex items-center gap-2">
+                            <Calendar className="h-4 w-4" />
+                            <span>Başlangıç: {item.startDate}</span>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <Clock className="h-4 w-4" />
+                            <span>Tahmini Bitiş: {item.estimatedEndDate}</span>
+                          </div>
+                        </div>
+
+                        {/* SWOT Grid */}
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                          {/* Güçlü Yönler */}
+                          <div className="space-y-3">
+                            <h4 className="font-semibold text-green-600">Güçlü Yönler (S)</h4>
+                            <div className="space-y-2">
+                              {swotData.strengths.map((strength, index) => (
+                                <Input
+                                  key={index}
+                                  value={strength}
+                                  onChange={(e) => updateSwotItem('strengths', index, e.target.value)}
+                                  placeholder="Güçlü yön girin..."
+                                  className="text-sm"
+                                />
+                              ))}
+                              <Button 
+                                onClick={() => addSwotItem('strengths')} 
+                                variant="outline" 
+                                size="sm"
+                                className="w-full"
+                              >
+                                <Plus className="h-4 w-4 mr-2" />
+                                Ekle
+                              </Button>
+                            </div>
+                          </div>
+
+                          {/* Zayıf Yönler */}
+                          <div className="space-y-3">
+                            <h4 className="font-semibold text-red-600">Zayıf Yönler (W)</h4>
+                            <div className="space-y-2">
+                              {swotData.weaknesses.map((weakness, index) => (
+                                <Input
+                                  key={index}
+                                  value={weakness}
+                                  onChange={(e) => updateSwotItem('weaknesses', index, e.target.value)}
+                                  placeholder="Zayıf yön girin..."
+                                  className="text-sm"
+                                />
+                              ))}
+                              <Button 
+                                onClick={() => addSwotItem('weaknesses')} 
+                                variant="outline" 
+                                size="sm"
+                                className="w-full"
+                              >
+                                <Plus className="h-4 w-4 mr-2" />
+                                Ekle
+                              </Button>
+                            </div>
+                          </div>
+
+                          {/* Fırsatlar */}
+                          <div className="space-y-3">
+                            <h4 className="font-semibold text-blue-600">Fırsatlar (O)</h4>
+                            <div className="space-y-2">
+                              {swotData.opportunities.map((opportunity, index) => (
+                                <Input
+                                  key={index}
+                                  value={opportunity}
+                                  onChange={(e) => updateSwotItem('opportunities', index, e.target.value)}
+                                  placeholder="Fırsat girin..."
+                                  className="text-sm"
+                                />
+                              ))}
+                              <Button 
+                                onClick={() => addSwotItem('opportunities')} 
+                                variant="outline" 
+                                size="sm"
+                                className="w-full"
+                              >
+                                <Plus className="h-4 w-4 mr-2" />
+                                Ekle
+                              </Button>
+                            </div>
+                          </div>
+
+                          {/* Tehditler */}
+                          <div className="space-y-3">
+                            <h4 className="font-semibold text-orange-600">Tehditler (T)</h4>
+                            <div className="space-y-2">
+                              {swotData.threats.map((threat, index) => (
+                                <Input
+                                  key={index}
+                                  value={threat}
+                                  onChange={(e) => updateSwotItem('threats', index, e.target.value)}
+                                  placeholder="Tehdit girin..."
+                                  className="text-sm"
+                                />
+                              ))}
+                              <Button 
+                                onClick={() => addSwotItem('threats')} 
+                                variant="outline" 
+                                size="sm"
+                                className="w-full"
+                              >
+                                <Plus className="h-4 w-4 mr-2" />
+                                Ekle
+                              </Button>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Eylem Planları */}
+                        <div className="space-y-6">
+                          {/* Güçlü X Fırsat */}
+                          <div className="p-4 bg-green-50 rounded-lg">
+                            <h5 className="font-semibold text-green-700 mb-3">Güçlü X Fırsat Tablosundan Çıkan Eylemler</h5>
+                            <div className="space-y-2">
+                              {swotData.soActions.map((action, index) => (
+                                <Input
+                                  key={index}
+                                  value={action}
+                                  onChange={(e) => updateSwotItem('soActions', index, e.target.value)}
+                                  placeholder="SO stratejisi eylem girin..."
+                                  className="text-sm bg-white"
+                                />
+                              ))}
+                              <Button 
+                                onClick={() => addSwotItem('soActions')} 
+                                variant="outline" 
+                                size="sm"
+                                className="w-full"
+                              >
+                                <Plus className="h-4 w-4 mr-2" />
+                                Eylem Ekle
+                              </Button>
+                            </div>
+                          </div>
+
+                          {/* Güçlü X Tehdit */}
+                          <div className="p-4 bg-orange-50 rounded-lg">
+                            <h5 className="font-semibold text-orange-700 mb-3">Güçlü X Tehdit Tablosundan Çıkan Eylemler</h5>
+                            <div className="space-y-2">
+                              {swotData.stActions.map((action, index) => (
+                                <Input
+                                  key={index}
+                                  value={action}
+                                  onChange={(e) => updateSwotItem('stActions', index, e.target.value)}
+                                  placeholder="ST stratejisi eylem girin..."
+                                  className="text-sm bg-white"
+                                />
+                              ))}
+                              <Button 
+                                onClick={() => addSwotItem('stActions')} 
+                                variant="outline" 
+                                size="sm"
+                                className="w-full"
+                              >
+                                <Plus className="h-4 w-4 mr-2" />
+                                Eylem Ekle
+                              </Button>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Diğer analiz bölümleri için varsayılan görünüm */}
+                    {item.id !== 'swot' && item.id !== 'goals' && item.files.length === 0 && (
                       <div className="text-center py-8 text-muted-foreground">
                         <div className="flex items-center justify-center gap-2 mb-2">
                           <Calendar className="h-4 w-4" />
@@ -394,7 +707,9 @@ export default function CustomerDashboard() {
                         <AlertCircle className="h-8 w-8 mx-auto mb-2 text-warning" />
                         <p>Henüz dosya eklenmedi</p>
                       </div>
-                    ) : (
+                    )}
+
+                    {item.files.length > 0 && (
                       <div className="space-y-2">
                         {item.files.map((file) => (
                           <div key={file.id} className="flex items-center justify-between p-3 bg-muted rounded-lg">
