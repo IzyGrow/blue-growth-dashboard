@@ -18,7 +18,9 @@ import {
   Plus,
   Target,
   Upload,
-  Link
+  Link,
+  Edit,
+  Trash2
 } from 'lucide-react';
 import { Input } from "@/components/ui/input";
 import { cn } from '@/lib/utils';
@@ -544,6 +546,35 @@ export default function CustomerDashboard() {
         : section
     ));
   };
+
+  const deletePlanningItem = (sectionId: string, itemId: number) => {
+    setPlanningItems(prev => prev.map(section => 
+      section.id === sectionId 
+        ? {
+            ...section,
+            items: section.items.filter(item => item.id !== itemId)
+          }
+        : section
+    ));
+  };
+
+  const updatePlanningItem = (sectionId: string, itemId: number, newName: string) => {
+    setPlanningItems(prev => prev.map(section => 
+      section.id === sectionId 
+        ? {
+            ...section,
+            items: section.items.map(item => 
+              item.id === itemId 
+                ? { ...item, name: newName }
+                : item
+            )
+          }
+        : section
+    ));
+  };
+
+  // State for editing items
+  const [editingItem, setEditingItem] = useState<{sectionId: string, itemId: number} | null>(null);
 
   const kpiData: KPIItem[] = [
     { name: 'Satış Yapılan Firma Sayısı', currentValue: 15, targetValue: 25, unit: 'firma', trend: 'up' },
@@ -1558,20 +1589,65 @@ export default function CustomerDashboard() {
                       {section.items.map((item) => (
                         <div 
                           key={item.id} 
-                          className="flex items-center gap-3 p-3 bg-muted rounded-lg cursor-pointer hover:bg-muted/80 transition-colors"
-                          onClick={() => togglePlanningItem(section.id, item.id)}
+                          className="flex items-center gap-3 p-3 bg-muted rounded-lg group"
                         >
-                          <div className={cn(
-                            "w-5 h-5 rounded border-2 flex items-center justify-center",
-                            item.completed ? "bg-success border-success" : "border-muted-foreground"
-                          )}>
+                          <div 
+                            className={cn(
+                              "w-5 h-5 rounded border-2 flex items-center justify-center cursor-pointer",
+                              item.completed ? "bg-success border-success" : "border-muted-foreground"
+                            )}
+                            onClick={() => togglePlanningItem(section.id, item.id)}
+                          >
                             {item.completed && <CheckCircle className="h-3 w-3 text-white" />}
                           </div>
-                          <span className={cn(
-                            item.completed ? "line-through text-muted-foreground" : ""
-                          )}>
-                            {item.name}
-                          </span>
+                          
+                          {editingItem?.sectionId === section.id && editingItem?.itemId === item.id ? (
+                            <Input 
+                              defaultValue={item.name}
+                              autoFocus
+                              onKeyPress={(e) => {
+                                if (e.key === 'Enter') {
+                                  const target = e.target as HTMLInputElement;
+                                  updatePlanningItem(section.id, item.id, target.value);
+                                  setEditingItem(null);
+                                }
+                              }}
+                              onBlur={(e) => {
+                                updatePlanningItem(section.id, item.id, e.target.value);
+                                setEditingItem(null);
+                              }}
+                              className="flex-1"
+                            />
+                          ) : (
+                            <span 
+                              className={cn(
+                                "flex-1",
+                                item.completed ? "line-through text-muted-foreground" : ""
+                              )}
+                            >
+                              {item.name}
+                            </span>
+                          )}
+                          
+                          <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                            <Button
+                              size="sm"
+                              variant="ghost"
+                              onClick={() => setEditingItem({sectionId: section.id, itemId: item.id})}
+                              className="h-6 w-6 p-0"
+                            >
+                              <Edit className="h-3 w-3" />
+                            </Button>
+                            <Button
+                              size="sm"
+                              variant="ghost"
+                              onClick={() => deletePlanningItem(section.id, item.id)}
+                              className="h-6 w-6 p-0 text-destructive hover:text-destructive"
+                            >
+                              <Trash2 className="h-3 w-3" />
+                            </Button>
+                          </div>
+                          
                           {item.completed && <Badge className="bg-success text-white text-xs">Tamamlandı</Badge>}
                         </div>
                       ))}
