@@ -1576,35 +1576,33 @@ export default function CustomerDashboard() {
                         </div>
                       ))}
                       
-                      {/* Add new item button for Social Media Planning */}
-                      {section.id === 'social-planning' && (
-                        <div className="flex items-center gap-2 mt-4">
-                          <Input 
-                            placeholder="Yeni planlama maddesi ekle..."
-                            onKeyPress={(e) => {
-                              if (e.key === 'Enter') {
-                                const target = e.target as HTMLInputElement;
-                                if (target.value.trim()) {
-                                  addPlanningItem(section.id, target.value.trim());
-                                  target.value = '';
-                                }
+                      {/* Add new item button for all planning sections */}
+                      <div className="flex items-center gap-2 mt-4">
+                        <Input 
+                          placeholder="Yeni planlama maddesi ekle..."
+                          onKeyPress={(e) => {
+                            if (e.key === 'Enter') {
+                              const target = e.target as HTMLInputElement;
+                              if (target.value.trim()) {
+                                addPlanningItem(section.id, target.value.trim());
+                                target.value = '';
                               }
-                            }}
-                          />
-                          <Button 
-                            size="sm"
-                            onClick={(e) => {
-                              const input = (e.currentTarget.parentElement?.querySelector('input') as HTMLInputElement);
-                              if (input?.value.trim()) {
-                                addPlanningItem(section.id, input.value.trim());
-                                input.value = '';
-                              }
-                            }}
-                          >
-                            <Plus className="h-4 w-4" />
-                          </Button>
-                        </div>
-                      )}
+                            }
+                          }}
+                        />
+                        <Button 
+                          size="sm"
+                          onClick={(e) => {
+                            const input = (e.currentTarget.parentElement?.querySelector('input') as HTMLInputElement);
+                            if (input?.value.trim()) {
+                              addPlanningItem(section.id, input.value.trim());
+                              input.value = '';
+                            }
+                          }}
+                        >
+                          <Plus className="h-4 w-4" />
+                        </Button>
+                      </div>
                     </div>
                   </CardContent>
                 )}
