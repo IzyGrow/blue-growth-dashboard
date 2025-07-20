@@ -297,7 +297,57 @@ export default function CustomerDashboard() {
     }));
   };
 
-  // Rakip Analizi helper functions
+  // Website Analysis file management
+  const [websiteFiles, setWebsiteFiles] = useState<Array<{
+    id: string;
+    name: string;
+    size: number;
+    uploadDate: string;
+    file: File;
+  }>>([]);
+
+  const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const files = event.target.files;
+    if (!files) return;
+
+    Array.from(files).forEach(file => {
+      const newFile = {
+        id: Date.now().toString() + Math.random().toString(36).substr(2, 9),
+        name: file.name,
+        size: file.size,
+        uploadDate: new Date().toLocaleDateString('tr-TR'),
+        file: file
+      };
+      
+      setWebsiteFiles(prev => [...prev, newFile]);
+    });
+  };
+
+  const downloadFile = (fileId: string) => {
+    const file = websiteFiles.find(f => f.id === fileId);
+    if (!file) return;
+
+    const url = URL.createObjectURL(file.file);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = file.name;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  };
+
+  const removeFile = (fileId: string) => {
+    setWebsiteFiles(prev => prev.filter(file => file.id !== fileId));
+  };
+
+  const formatFileSize = (bytes: number) => {
+    if (bytes === 0) return '0 Bytes';
+    const k = 1024;
+    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+  };
   const addCompetitor = (name: string, socialMedia: string, linkedin: string, website: string) => {
     const newCompetitor = {
       id: Date.now(),
@@ -1329,6 +1379,7 @@ export default function CustomerDashboard() {
                                 id={`file-upload-${item.id}`}
                                 multiple
                                 accept=".pdf,.doc,.docx,.jpg,.png,.jpeg"
+                                onChange={handleFileUpload}
                               />
                               <Button 
                                 variant="outline" 
@@ -1338,16 +1389,58 @@ export default function CustomerDashboard() {
                                 <Upload className="h-4 w-4 mr-2" />
                                 Dosya Seç
                               </Button>
-                              <Button variant="ghost" size="sm">
-                                <Link className="h-4 w-4 mr-2" />
-                                veya URL Ekle
-                              </Button>
                             </div>
                             <p className="text-xs text-muted-foreground">
                               Desteklenen formatlar: PDF, Word, JPG, PNG (Maks. 10MB)
                             </p>
                           </div>
                         </div>
+
+                        {/* Yüklenen dosyaları göster */}
+                        {websiteFiles.length > 0 && (
+                          <Card>
+                            <CardHeader>
+                              <CardTitle>Yüklenen Dosyalar</CardTitle>
+                              <CardDescription>İnternet sitesi analizi için yüklenen dosyalar</CardDescription>
+                            </CardHeader>
+                            <CardContent>
+                              <div className="space-y-3">
+                                {websiteFiles.map((file) => (
+                                  <div key={file.id} className="flex items-center justify-between p-3 bg-muted/30 rounded-lg border">
+                                    <div className="flex items-center gap-3">
+                                      <div className="p-2 bg-primary/10 rounded">
+                                        <Download className="h-4 w-4 text-primary" />
+                                      </div>
+                                      <div>
+                                        <p className="font-medium text-sm">{file.name}</p>
+                                        <p className="text-xs text-muted-foreground">
+                                          {formatFileSize(file.size)} • Yükleme: {file.uploadDate}
+                                        </p>
+                                      </div>
+                                    </div>
+                                    <div className="flex items-center gap-2">
+                                      <Button
+                                        size="sm"
+                                        variant="outline"
+                                        onClick={() => downloadFile(file.id)}
+                                      >
+                                        <Download className="h-4 w-4" />
+                                      </Button>
+                                      <Button
+                                        size="sm"
+                                        variant="ghost"
+                                        onClick={() => removeFile(file.id)}
+                                        className="text-destructive hover:text-destructive"
+                                      >
+                                        ×
+                                      </Button>
+                                    </div>
+                                  </div>
+                                ))}
+                              </div>
+                            </CardContent>
+                          </Card>
+                        )}
                       </div>
                     )}
 
