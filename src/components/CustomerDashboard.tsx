@@ -16,7 +16,9 @@ import {
   TrendingUp,
   Package,
   Plus,
-  Target
+  Target,
+  Upload,
+  Link
 } from 'lucide-react';
 import { Input } from "@/components/ui/input";
 import { cn } from '@/lib/utils';
@@ -1308,8 +1310,49 @@ export default function CustomerDashboard() {
                       </div>
                     )}
 
+                    {/* İnternet Sitesi Analizi için özel dosya yükleme alanı */}
+                    {item.id === 'website' && (
+                      <div className="space-y-4">
+                        <div className="border-2 border-dashed border-muted-foreground/25 rounded-lg p-8 text-center">
+                          <div className="flex flex-col items-center gap-4">
+                            <div className="p-4 bg-muted rounded-full">
+                              <Upload className="h-8 w-8 text-muted-foreground" />
+                            </div>
+                            <div>
+                              <h3 className="text-lg font-medium mb-2">Dosya Yükle</h3>
+                              <p className="text-muted-foreground mb-4">
+                                İnternet sitesi analizi için dosyalarınızı buraya yükleyin
+                              </p>
+                              <Input 
+                                type="file" 
+                                className="hidden" 
+                                id={`file-upload-${item.id}`}
+                                multiple
+                                accept=".pdf,.doc,.docx,.jpg,.png,.jpeg"
+                              />
+                              <Button 
+                                variant="outline" 
+                                onClick={() => document.getElementById(`file-upload-${item.id}`)?.click()}
+                                className="mr-2"
+                              >
+                                <Upload className="h-4 w-4 mr-2" />
+                                Dosya Seç
+                              </Button>
+                              <Button variant="ghost" size="sm">
+                                <Link className="h-4 w-4 mr-2" />
+                                veya URL Ekle
+                              </Button>
+                            </div>
+                            <p className="text-xs text-muted-foreground">
+                              Desteklenen formatlar: PDF, Word, JPG, PNG (Maks. 10MB)
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+
                     {/* Diğer analiz bölümleri için varsayılan görünüm */}
-                    {item.id !== 'swot' && item.id !== 'goals' && item.id !== 'target' && item.id !== 'competitor' && item.files.length === 0 && (
+                    {item.id !== 'swot' && item.id !== 'goals' && item.id !== 'target' && item.id !== 'competitor' && item.id !== 'website' && item.files.length === 0 && (
                       <div className="text-center py-8 text-muted-foreground">
                         <div className="flex items-center justify-center gap-2 mb-2">
                           <Calendar className="h-4 w-4" />
