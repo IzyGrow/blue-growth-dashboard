@@ -20,7 +20,8 @@ import {
   Upload,
   Link,
   Edit,
-  Trash2
+  Trash2,
+  Code
 } from 'lucide-react';
 import { Input } from "@/components/ui/input";
 import { cn } from '@/lib/utils';
@@ -656,13 +657,14 @@ export default function CustomerDashboard() {
         </div>
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-          <TabsList className="grid w-full grid-cols-6 lg:w-fit lg:grid-cols-6">
+          <TabsList className="grid w-full grid-cols-7 lg:w-fit lg:grid-cols-7">
             <TabsTrigger value="ozet">Özet</TabsTrigger>
             <TabsTrigger value="abonelik">Abonelik</TabsTrigger>
             <TabsTrigger value="analiz">Analiz</TabsTrigger>
             <TabsTrigger value="planlama">Planlama</TabsTrigger>
             <TabsTrigger value="uygulama">Uygulama</TabsTrigger>
             <TabsTrigger value="performans-iyilestirme">Performans ve İyileştirme</TabsTrigger>
+            <TabsTrigger value="ozel-gelistirme">Özel Geliştirme</TabsTrigger>
           </TabsList>
 
           {/* Özet Tab */}
@@ -1834,6 +1836,102 @@ export default function CustomerDashboard() {
                       ))}
                     </tbody>
                   </table>
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* Özel Geliştirme Tab */}
+          <TabsContent value="ozel-gelistirme" className="space-y-6">
+            <Card className="bg-gradient-card border-0 shadow-elegant">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Code className="h-5 w-5" />
+                  Özel Yazılım Geliştirme Aşamaları
+                </CardTitle>
+                <CardDescription>
+                  Müşteri için özel olarak geliştirilecek yazılım projesinin detaylı aşamaları
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  {[
+                    {
+                      title: "Gereksinim Analizi",
+                      description: "Müşteri ihtiyaçlarının detaylı analizi ve dokümantasyonu",
+                      status: "not-started",
+                      duration: "1-2 hafta"
+                    },
+                    {
+                      title: "Teknik Tasarım",
+                      description: "Sistem mimarisi ve teknik şartname hazırlanması",
+                      status: "not-started", 
+                      duration: "1 hafta"
+                    },
+                    {
+                      title: "UI/UX Tasarım",
+                      description: "Kullanıcı arayüzü ve deneyimi tasarımı",
+                      status: "not-started",
+                      duration: "2 hafta"
+                    },
+                    {
+                      title: "Backend Geliştirme",
+                      description: "Sunucu tarafı programlama ve veritabanı kurulumu",
+                      status: "not-started",
+                      duration: "3-4 hafta"
+                    },
+                    {
+                      title: "Frontend Geliştirme", 
+                      description: "Kullanıcı arayüzü programlaması",
+                      status: "not-started",
+                      duration: "2-3 hafta"
+                    },
+                    {
+                      title: "Test ve Hata Ayıklama",
+                      description: "Yazılımın test edilmesi ve hataların giderilmesi",
+                      status: "not-started",
+                      duration: "1-2 hafta"
+                    },
+                    {
+                      title: "Deployment ve Devreye Alma",
+                      description: "Yazılımın canlı ortama alınması",
+                      status: "not-started",
+                      duration: "1 hafta"
+                    },
+                    {
+                      title: "Eğitim ve Dokümantasyon",
+                      description: "Kullanıcı eğitimi ve kullanım kılavuzu hazırlanması",
+                      status: "not-started",
+                      duration: "1 hafta"
+                    },
+                    {
+                      title: "Bakım ve Destek",
+                      description: "Sürekli bakım ve teknik destek hizmetleri",
+                      status: "not-started",
+                      duration: "Sürekli"
+                    }
+                  ].map((stage, index) => (
+                    <div key={index} className="flex items-center justify-between p-4 bg-muted/30 rounded-lg">
+                      <div className="flex items-center gap-4">
+                        <div className={cn(
+                          "w-8 h-8 rounded-full flex items-center justify-center text-sm font-semibold",
+                          stage.status === 'completed' ? "bg-success text-white" :
+                          stage.status === 'in-progress' ? "bg-warning text-white" :
+                          "bg-muted text-muted-foreground"
+                        )}>
+                          {index + 1}
+                        </div>
+                        <div>
+                          <h3 className="font-semibold">{stage.title}</h3>
+                          <p className="text-sm text-muted-foreground">{stage.description}</p>
+                          <p className="text-xs text-primary">Süre: {stage.duration}</p>
+                        </div>
+                      </div>
+                      <div className="text-right">
+                        {getStatusBadge(stage.status)}
+                      </div>
+                    </div>
+                  ))}
                 </div>
               </CardContent>
             </Card>
