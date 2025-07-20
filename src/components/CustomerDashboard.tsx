@@ -306,7 +306,16 @@ export default function CustomerDashboard() {
     file: File;
   }>>([]);
 
-  const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+  // Brand Analysis file management
+  const [brandFiles, setBrandFiles] = useState<Array<{
+    id: string;
+    name: string;
+    size: number;
+    uploadDate: string;
+    file: File;
+  }>>([]);
+
+  const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>, type: 'website' | 'brand') => {
     const files = event.target.files;
     if (!files) return;
 
@@ -319,12 +328,17 @@ export default function CustomerDashboard() {
         file: file
       };
       
-      setWebsiteFiles(prev => [...prev, newFile]);
+      if (type === 'website') {
+        setWebsiteFiles(prev => [...prev, newFile]);
+      } else {
+        setBrandFiles(prev => [...prev, newFile]);
+      }
     });
   };
 
-  const downloadFile = (fileId: string) => {
-    const file = websiteFiles.find(f => f.id === fileId);
+  const downloadFile = (fileId: string, type: 'website' | 'brand') => {
+    const fileList = type === 'website' ? websiteFiles : brandFiles;
+    const file = fileList.find(f => f.id === fileId);
     if (!file) return;
 
     const url = URL.createObjectURL(file.file);
@@ -337,8 +351,12 @@ export default function CustomerDashboard() {
     URL.revokeObjectURL(url);
   };
 
-  const removeFile = (fileId: string) => {
-    setWebsiteFiles(prev => prev.filter(file => file.id !== fileId));
+  const removeFile = (fileId: string, type: 'website' | 'brand') => {
+    if (type === 'website') {
+      setWebsiteFiles(prev => prev.filter(file => file.id !== fileId));
+    } else {
+      setBrandFiles(prev => prev.filter(file => file.id !== fileId));
+    }
   };
 
   const formatFileSize = (bytes: number) => {
@@ -1379,7 +1397,7 @@ export default function CustomerDashboard() {
                                 id={`file-upload-${item.id}`}
                                 multiple
                                 accept=".pdf,.doc,.docx,.jpg,.png,.jpeg"
-                                onChange={handleFileUpload}
+                                onChange={(e) => handleFileUpload(e, item.id as 'website' | 'brand')}
                               />
                               <Button 
                                 variant="outline" 
@@ -1397,7 +1415,7 @@ export default function CustomerDashboard() {
                         </div>
 
                         {/* Yüklenen dosyaları göster */}
-                        {websiteFiles.length > 0 && (
+                        {((item.id === 'website' && websiteFiles.length > 0) || (item.id === 'brand' && brandFiles.length > 0)) && (
                           <Card>
                             <CardHeader>
                               <CardTitle>Yüklenen Dosyalar</CardTitle>
@@ -1405,7 +1423,7 @@ export default function CustomerDashboard() {
                             </CardHeader>
                             <CardContent>
                               <div className="space-y-3">
-                                {websiteFiles.map((file) => (
+                                {(item.id === 'website' ? websiteFiles : brandFiles).map((file) => (
                                   <div key={file.id} className="flex items-center justify-between p-3 bg-muted/30 rounded-lg border">
                                     <div className="flex items-center gap-3">
                                       <div className="p-2 bg-primary/10 rounded">
@@ -1422,14 +1440,14 @@ export default function CustomerDashboard() {
                                       <Button
                                         size="sm"
                                         variant="outline"
-                                        onClick={() => downloadFile(file.id)}
+                                        onClick={() => downloadFile(file.id, item.id as 'website' | 'brand')}
                                       >
                                         <Download className="h-4 w-4" />
                                       </Button>
                                       <Button
                                         size="sm"
                                         variant="ghost"
-                                        onClick={() => removeFile(file.id)}
+                                        onClick={() => removeFile(file.id, item.id as 'website' | 'brand')}
                                         className="text-destructive hover:text-destructive"
                                       >
                                         ×
