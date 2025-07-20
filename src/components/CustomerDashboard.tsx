@@ -513,6 +513,14 @@ export default function CustomerDashboard() {
         { id: 9, name: 'Otomasyon Kurulumu', completed: false },
         { id: 10, name: 'Segment Tanımlama', completed: false }
       ]
+    },
+    {
+      id: 'ad-planning',
+      title: 'Reklam Planlaması',
+      items: [
+        { id: 11, name: 'Meta Reklamı', completed: false },
+        { id: 12, name: 'Ülke Reklamı', completed: false }
+      ]
     }
   ]);
 
