@@ -215,29 +215,36 @@ export default function CustomerDashboard() {
   // Target Analysis helper functions
   const addService = () => {
     const newId = Math.max(...targetAnalysisData.services.map(s => s.id)) + 1;
+    // Find the index where to insert the new service (after the last persona)
+    const lastServiceIndex = targetAnalysisData.services.length - 1;
+    const insertIndex = lastServiceIndex + 1;
+    
+    const newServices = [...targetAnalysisData.services];
+    newServices.splice(insertIndex, 0, {
+      id: newId,
+      name: '',
+      targetGroups: [{
+        id: 1,
+        ageRange: '',
+        location: '',
+        education: '',
+        interests: '',
+        persona: {
+          name: '',
+          bio: '',
+          profession: '',
+          hasChildren: '',
+          residence: '',
+          likes: '',
+          painPoints: '',
+          motivations: ''
+        }
+      }]
+    });
+    
     setTargetAnalysisData(prev => ({
       ...prev,
-      services: [...prev.services, {
-        id: newId,
-        name: '',
-        targetGroups: [{
-          id: 1,
-          ageRange: '',
-          location: '',
-          education: '',
-          interests: '',
-          persona: {
-            name: '',
-            bio: '',
-            profession: '',
-            hasChildren: '',
-            residence: '',
-            likes: '',
-            painPoints: '',
-            motivations: ''
-          }
-        }]
-      }]
+      services: newServices
     }));
   };
 
@@ -825,10 +832,10 @@ export default function CustomerDashboard() {
                         {/* Hizmetler Bölümü */}
                         <div className="space-y-4">
                           <div className="flex items-center justify-between">
-                            <h4 className="font-semibold text-primary">Hizmetler</h4>
+                            <h4 className="font-semibold text-primary">Hizmet/Ürün</h4>
                             <Button onClick={addService} variant="outline" size="sm">
                               <Plus className="h-4 w-4 mr-2" />
-                              Hizmet Ekle
+                              Hizmet/Ürün Ekle
                             </Button>
                           </div>
 
@@ -838,7 +845,7 @@ export default function CustomerDashboard() {
                               <Input
                                 value={service.name}
                                 onChange={(e) => updateServiceName(service.id, e.target.value)}
-                                placeholder="Hizmet adını girin..."
+                                placeholder="Hizmet/Ürün adını girin..."
                                 className="font-medium"
                               />
 
@@ -878,15 +885,19 @@ export default function CustomerDashboard() {
                                           className="text-sm"
                                         />
                                       </div>
-                                      <div>
-                                        <label className="text-sm font-medium mb-1 block">Eğitim Durumu</label>
-                                        <Input
-                                          value={group.education}
-                                          onChange={(e) => updateTargetGroup(service.id, group.id, 'education', e.target.value)}
-                                          placeholder="Örn: Üniversite mezunu"
-                                          className="text-sm"
-                                        />
-                                      </div>
+                                       <div>
+                                         <label className="text-sm font-medium mb-1 block">Eğitim Durumu</label>
+                                         <select
+                                           value={group.education}
+                                           onChange={(e) => updateTargetGroup(service.id, group.id, 'education', e.target.value)}
+                                           className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                                         >
+                                           <option value="">Seçiniz</option>
+                                           <option value="eğitimli">Eğitimli</option>
+                                           <option value="eğitimsiz">Eğitimsiz</option>
+                                           <option value="bu hizmet için önemli kriter değil">Bu hizmet için önemli kriter değil</option>
+                                         </select>
+                                       </div>
                                       <div>
                                         <label className="text-sm font-medium mb-1 block">İlgi Alanları</label>
                                         <Input
