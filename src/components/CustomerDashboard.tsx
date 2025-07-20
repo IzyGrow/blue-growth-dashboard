@@ -483,36 +483,67 @@ export default function CustomerDashboard() {
     }));
   };
 
-  const planningItems = [
+  const [planningItems, setPlanningItems] = useState([
     {
       id: 'social-planning',
       title: 'Sosyal Medya Planlaması',
       items: [
-        { name: 'Instagram Yönetimi', completed: false },
-        { name: 'Facebook Yönetimi', completed: true },
-        { name: 'LinkedIn Stratejisi', completed: false },
-        { name: 'İçerik Takvimi', completed: false }
+        { id: 1, name: 'Instagram Yönetimi', completed: false },
+        { id: 2, name: 'Facebook Yönetimi', completed: true },
+        { id: 3, name: 'LinkedIn Stratejisi', completed: false },
+        { id: 4, name: 'İçerik Takvimi', completed: false }
       ]
     },
     {
       id: 'ecommerce-planning', 
       title: 'E-ticaret Planlaması',
       items: [
-        { name: 'Shopify Kurulumu', completed: true },
-        { name: 'Ürün Katalogu', completed: false },
-        { name: 'Ödeme Sistemleri', completed: false }
+        { id: 5, name: 'Shopify Kurulumu', completed: true },
+        { id: 6, name: 'Ürün Katalogu', completed: false },
+        { id: 7, name: 'Ödeme Sistemleri', completed: false }
       ]
     },
     {
       id: 'email-planning',
       title: 'E-mail Sistem Planlaması', 
       items: [
-        { name: 'Email Şablonları', completed: false },
-        { name: 'Otomasyon Kurulumu', completed: false },
-        { name: 'Segment Tanımlama', completed: false }
+        { id: 8, name: 'Email Şablonları', completed: false },
+        { id: 9, name: 'Otomasyon Kurulumu', completed: false },
+        { id: 10, name: 'Segment Tanımlama', completed: false }
       ]
     }
-  ];
+  ]);
+
+  // Planning item management functions
+  const addPlanningItem = (sectionId: string, itemName: string) => {
+    setPlanningItems(prev => prev.map(section => 
+      section.id === sectionId 
+        ? {
+            ...section,
+            items: [...section.items, {
+              id: Date.now(),
+              name: itemName,
+              completed: false
+            }]
+          }
+        : section
+    ));
+  };
+
+  const togglePlanningItem = (sectionId: string, itemId: number) => {
+    setPlanningItems(prev => prev.map(section => 
+      section.id === sectionId 
+        ? {
+            ...section,
+            items: section.items.map(item => 
+              item.id === itemId 
+                ? { ...item, completed: !item.completed }
+                : item
+            )
+          }
+        : section
+    ));
+  };
 
   const kpiData: KPIItem[] = [
     { name: 'Satış Yapılan Firma Sayısı', currentValue: 15, targetValue: 25, unit: 'firma', trend: 'up' },
@@ -1524,8 +1555,12 @@ export default function CustomerDashboard() {
                 {expandedSections[section.id] && (
                   <CardContent>
                     <div className="space-y-3">
-                      {section.items.map((item, index) => (
-                        <div key={index} className="flex items-center gap-3 p-3 bg-muted rounded-lg">
+                      {section.items.map((item) => (
+                        <div 
+                          key={item.id} 
+                          className="flex items-center gap-3 p-3 bg-muted rounded-lg cursor-pointer hover:bg-muted/80 transition-colors"
+                          onClick={() => togglePlanningItem(section.id, item.id)}
+                        >
                           <div className={cn(
                             "w-5 h-5 rounded border-2 flex items-center justify-center",
                             item.completed ? "bg-success border-success" : "border-muted-foreground"
@@ -1540,6 +1575,36 @@ export default function CustomerDashboard() {
                           {item.completed && <Badge className="bg-success text-white text-xs">Tamamlandı</Badge>}
                         </div>
                       ))}
+                      
+                      {/* Add new item button for Social Media Planning */}
+                      {section.id === 'social-planning' && (
+                        <div className="flex items-center gap-2 mt-4">
+                          <Input 
+                            placeholder="Yeni planlama maddesi ekle..."
+                            onKeyPress={(e) => {
+                              if (e.key === 'Enter') {
+                                const target = e.target as HTMLInputElement;
+                                if (target.value.trim()) {
+                                  addPlanningItem(section.id, target.value.trim());
+                                  target.value = '';
+                                }
+                              }
+                            }}
+                          />
+                          <Button 
+                            size="sm"
+                            onClick={(e) => {
+                              const input = (e.currentTarget.parentElement?.querySelector('input') as HTMLInputElement);
+                              if (input?.value.trim()) {
+                                addPlanningItem(section.id, input.value.trim());
+                                input.value = '';
+                              }
+                            }}
+                          >
+                            <Plus className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      )}
                     </div>
                   </CardContent>
                 )}
