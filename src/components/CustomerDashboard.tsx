@@ -148,6 +148,13 @@ export default function CustomerDashboard() {
     stActions: ['']
   });
 
+  // Rakip Analizi için state'ler
+  const [competitorData, setCompetitorData] = useState({
+    competitors: [],
+    features: [''],
+    comparisonTable: {}
+  });
+
   // Hedefler için state'ler  
   const [goalsData, setGoalsData] = useState({
     shortTerm: [''],
@@ -278,14 +285,95 @@ export default function CustomerDashboard() {
         service.id === serviceId ? {
           ...service,
           targetGroups: service.targetGroups.map(group =>
-            group.id === groupId ? { 
-              ...group, 
+            group.id === groupId ? {
+              ...group,
               persona: { ...group.persona, [field]: value }
             } : group
           )
         } : service
       )
     }));
+  };
+
+  // Rakip Analizi helper functions
+  const addCompetitor = (name: string, socialMedia: string, linkedin: string, website: string) => {
+    const newCompetitor = {
+      id: Date.now(),
+      name,
+      socialMedia,
+      linkedin,
+      website
+    };
+    
+    setCompetitorData(prev => {
+      const updatedCompetitors = [...prev.competitors, newCompetitor];
+      
+      // Yeni tablo verileri oluştur
+      const newTable = {};
+      prev.features.forEach(feature => {
+        if (feature.trim()) {
+          newTable[feature] = { ...prev.comparisonTable[feature] || {} };
+          newTable[feature][newCompetitor.name] = '';
+          newTable[feature]['İntime'] = newTable[feature]['İntime'] || '';
+        }
+      });
+      
+      return {
+        ...prev,
+        competitors: updatedCompetitors,
+        comparisonTable: newTable
+      };
+    });
+  };
+
+  const addFeature = (feature: string) => {
+    if (!feature.trim()) return;
+    
+    setCompetitorData(prev => {
+      const updatedFeatures = [...prev.features, feature];
+      
+      // Tüm rakipler için yeni özellik satırı ekle
+      const newTable = { ...prev.comparisonTable };
+      newTable[feature] = {};
+      newTable[feature]['İntime'] = '';
+      prev.competitors.forEach(competitor => {
+        newTable[feature][competitor.name] = '';
+      });
+      
+      return {
+        ...prev,
+        features: updatedFeatures,
+        comparisonTable: newTable
+      };
+    });
+  };
+
+  const updateComparisonScore = (feature: string, competitor: string, score: string) => {
+    setCompetitorData(prev => ({
+      ...prev,
+      comparisonTable: {
+        ...prev.comparisonTable,
+        [feature]: {
+          ...prev.comparisonTable[feature],
+          [competitor]: score
+        }
+      }
+    }));
+  };
+
+  const calculateRowTotal = (feature: string) => {
+    const row = competitorData.comparisonTable[feature] || {};
+    return Object.values(row).reduce((sum: number, score: unknown) => {
+      const num = parseFloat(String(score)) || 0;
+      return sum + num;
+    }, 0);
+  };
+
+  const calculateColumnTotal = (competitor: string) => {
+    return competitorData.features.reduce((sum: number, feature: string) => {
+      const score = competitorData.comparisonTable[feature]?.[competitor] || '0';
+      return sum + (parseFloat(String(score)) || 0);
+    }, 0);
   };
 
   const addTargetGroup = (serviceId: number) => {
@@ -996,8 +1084,218 @@ export default function CustomerDashboard() {
                       </div>
                     )}
 
+                    {/* Rakip Analizi */}
+                    {item.id === 'competitor' && (
+                      <div className="space-y-6">
+                        {/* Rakip Ekleme Formu */}
+                        <Card className="bg-blue-50 border border-blue-200">
+                          <CardHeader>
+                            <CardTitle className="text-blue-700">Yeni Rakip Ekle</CardTitle>
+                          </CardHeader>
+                          <CardContent>
+                            <form onSubmit={(e) => {
+                              e.preventDefault();
+                              const formData = new FormData(e.target as HTMLFormElement);
+                              const name = formData.get('name') as string;
+                              const socialMedia = formData.get('socialMedia') as string;
+                              const linkedin = formData.get('linkedin') as string;
+                              const website = formData.get('website') as string;
+                              
+                              if (name.trim()) {
+                                addCompetitor(name, socialMedia, linkedin, website);
+                                (e.target as HTMLFormElement).reset();
+                              }
+                            }} className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                              <div>
+                                <label className="text-sm font-medium mb-1 block">Rakibin Adı</label>
+                                <Input name="name" placeholder="Rakip adını girin..." required />
+                              </div>
+                              <div>
+                                <label className="text-sm font-medium mb-1 block">Sosyal Medya Adresi</label>
+                                <Input name="socialMedia" placeholder="Sosyal medya linki..." />
+                              </div>
+                              <div>
+                                <label className="text-sm font-medium mb-1 block">LinkedIn Adresi</label>
+                                <Input name="linkedin" placeholder="LinkedIn profil linki..." />
+                              </div>
+                              <div>
+                                <label className="text-sm font-medium mb-1 block">Web Adresi</label>
+                                <Input name="website" placeholder="Website URL'si..." />
+                              </div>
+                              <div className="md:col-span-2">
+                                <Button type="submit" className="w-full">
+                                  <Plus className="h-4 w-4 mr-2" />
+                                  Rakip Ekle
+                                </Button>
+                              </div>
+                            </form>
+                          </CardContent>
+                        </Card>
+
+                        {/* Özellik Ekleme */}
+                        <Card className="bg-green-50 border border-green-200">
+                          <CardHeader>
+                            <CardTitle className="text-green-700">Karşılaştırma Özelliği Ekle</CardTitle>
+                          </CardHeader>
+                          <CardContent>
+                            <form onSubmit={(e) => {
+                              e.preventDefault();
+                              const formData = new FormData(e.target as HTMLFormElement);
+                              const feature = formData.get('feature') as string;
+                              
+                              if (feature.trim()) {
+                                addFeature(feature);
+                                (e.target as HTMLFormElement).reset();
+                              }
+                            }} className="flex gap-2">
+                              <Input 
+                                name="feature" 
+                                placeholder="Karşılaştırılacak özellik..." 
+                                className="flex-1"
+                                required 
+                              />
+                              <Button type="submit">
+                                <Plus className="h-4 w-4 mr-2" />
+                                Ekle
+                              </Button>
+                            </form>
+                          </CardContent>
+                        </Card>
+
+                        {/* Karşılaştırma Tablosu */}
+                        {(competitorData.competitors.length > 0 || competitorData.features.some(f => f.trim())) && (
+                          <Card>
+                            <CardHeader>
+                              <CardTitle>Rakip Karşılaştırma Tablosu</CardTitle>
+                              <CardDescription>Her özellik için 10 üzerinden puan verin</CardDescription>
+                            </CardHeader>
+                            <CardContent>
+                              <div className="overflow-x-auto">
+                                <table className="w-full text-sm border-collapse">
+                                  <thead>
+                                    <tr className="border-b-2">
+                                      <th className="text-left p-3 bg-muted font-semibold">Özellikler</th>
+                                      <th className="text-center p-3 bg-blue-100 font-semibold">İntime</th>
+                                      {competitorData.competitors.map((competitor) => (
+                                        <th key={competitor.id} className="text-center p-3 bg-muted font-semibold">
+                                          {competitor.name}
+                                        </th>
+                                      ))}
+                                      <th className="text-center p-3 bg-orange-100 font-semibold">Toplam</th>
+                                    </tr>
+                                  </thead>
+                                  <tbody>
+                                    {competitorData.features.map((feature, index) => 
+                                      feature.trim() && (
+                                        <tr key={index} className="border-b">
+                                          <td className="p-3 font-medium bg-muted/50">{feature}</td>
+                                          <td className="p-2 text-center">
+                                            <Input
+                                              type="number"
+                                              min="0"
+                                              max="10"
+                                              value={competitorData.comparisonTable[feature]?.['İntime'] || ''}
+                                              onChange={(e) => updateComparisonScore(feature, 'İntime', e.target.value)}
+                                              className="w-16 text-center"
+                                              placeholder="0-10"
+                                            />
+                                          </td>
+                                          {competitorData.competitors.map((competitor) => (
+                                            <td key={competitor.id} className="p-2 text-center">
+                                              <Input
+                                                type="number"
+                                                min="0"
+                                                max="10"
+                                                value={competitorData.comparisonTable[feature]?.[competitor.name] || ''}
+                                                onChange={(e) => updateComparisonScore(feature, competitor.name, e.target.value)}
+                                                className="w-16 text-center"
+                                                placeholder="0-10"
+                                              />
+                                            </td>
+                                          ))}
+                                          <td className="p-3 text-center font-semibold bg-orange-50">
+                                            {Number(calculateRowTotal(feature)).toFixed(1)}
+                                          </td>
+                                        </tr>
+                                      )
+                                    )}
+                                    {competitorData.features.some(f => f.trim()) && (
+                                      <tr className="border-t-2 bg-orange-50">
+                                        <td className="p-3 font-semibold">TOPLAM</td>
+                                        <td className="p-3 text-center font-semibold">
+                                          {Number(calculateColumnTotal('İntime')).toFixed(1)}
+                                        </td>
+                                        {competitorData.competitors.map((competitor) => (
+                                          <td key={competitor.id} className="p-3 text-center font-semibold">
+                                            {Number(calculateColumnTotal(competitor.name)).toFixed(1)}
+                                          </td>
+                                        ))}
+                                        <td className="p-3 text-center font-semibold">
+                                          {Number(calculateColumnTotal('İntime') + 
+                                            competitorData.competitors.reduce((sum, comp) => 
+                                              sum + calculateColumnTotal(comp.name), 0)
+                                          ).toFixed(1)}
+                                        </td>
+                                      </tr>
+                                    )}
+                                  </tbody>
+                                </table>
+                              </div>
+                            </CardContent>
+                          </Card>
+                        )}
+
+                        {/* Rakip Bilgileri Listesi */}
+                        {competitorData.competitors.length > 0 && (
+                          <Card>
+                            <CardHeader>
+                              <CardTitle>Eklenen Rakipler</CardTitle>
+                            </CardHeader>
+                            <CardContent>
+                              <div className="space-y-3">
+                                {competitorData.competitors.map((competitor) => (
+                                  <div key={competitor.id} className="p-4 border rounded-lg bg-muted/30">
+                                    <h5 className="font-semibold mb-2">{competitor.name}</h5>
+                                    <div className="grid grid-cols-1 md:grid-cols-3 gap-2 text-sm">
+                                      {competitor.socialMedia && (
+                                        <div>
+                                          <span className="font-medium">Sosyal Medya: </span>
+                                          <a href={competitor.socialMedia} target="_blank" rel="noopener noreferrer" 
+                                             className="text-blue-600 hover:underline">
+                                            {competitor.socialMedia}
+                                          </a>
+                                        </div>
+                                      )}
+                                      {competitor.linkedin && (
+                                        <div>
+                                          <span className="font-medium">LinkedIn: </span>
+                                          <a href={competitor.linkedin} target="_blank" rel="noopener noreferrer" 
+                                             className="text-blue-600 hover:underline">
+                                            {competitor.linkedin}
+                                          </a>
+                                        </div>
+                                      )}
+                                      {competitor.website && (
+                                        <div>
+                                          <span className="font-medium">Website: </span>
+                                          <a href={competitor.website} target="_blank" rel="noopener noreferrer" 
+                                             className="text-blue-600 hover:underline">
+                                            {competitor.website}
+                                          </a>
+                                        </div>
+                                      )}
+                                    </div>
+                                  </div>
+                                ))}
+                              </div>
+                            </CardContent>
+                          </Card>
+                        )}
+                      </div>
+                    )}
+
                     {/* Diğer analiz bölümleri için varsayılan görünüm */}
-                    {item.id !== 'swot' && item.id !== 'goals' && item.id !== 'target' && item.files.length === 0 && (
+                    {item.id !== 'swot' && item.id !== 'goals' && item.id !== 'target' && item.id !== 'competitor' && item.files.length === 0 && (
                       <div className="text-center py-8 text-muted-foreground">
                         <div className="flex items-center justify-center gap-2 mb-2">
                           <Calendar className="h-4 w-4" />
