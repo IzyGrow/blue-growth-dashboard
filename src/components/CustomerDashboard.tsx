@@ -326,6 +326,15 @@ export default function CustomerDashboard() {
     });
   };
 
+  const updateCompetitor = (id: number, field: string, value: string) => {
+    setCompetitorData(prev => ({
+      ...prev,
+      competitors: prev.competitors.map(comp => 
+        comp.id === id ? { ...comp, [field]: value } : comp
+      )
+    }));
+  };
+
   const addFeature = (feature: string) => {
     if (!feature.trim()) return;
     
@@ -1245,45 +1254,50 @@ export default function CustomerDashboard() {
                           </Card>
                         )}
 
-                        {/* Rakip Bilgileri Listesi */}
+                        {/* Rakip Bilgileri Düzenleme */}
                         {competitorData.competitors.length > 0 && (
                           <Card>
                             <CardHeader>
-                              <CardTitle>Eklenen Rakipler</CardTitle>
+                              <CardTitle>Rakip Bilgilerini Düzenle</CardTitle>
+                              <CardDescription>Eklediğiniz rakiplerin bilgilerini buradan düzenleyebilirsiniz</CardDescription>
                             </CardHeader>
                             <CardContent>
-                              <div className="space-y-3">
+                              <div className="space-y-4">
                                 {competitorData.competitors.map((competitor) => (
                                   <div key={competitor.id} className="p-4 border rounded-lg bg-muted/30">
-                                    <h5 className="font-semibold mb-2">{competitor.name}</h5>
-                                    <div className="grid grid-cols-1 md:grid-cols-3 gap-2 text-sm">
-                                      {competitor.socialMedia && (
-                                        <div>
-                                          <span className="font-medium">Sosyal Medya: </span>
-                                          <a href={competitor.socialMedia} target="_blank" rel="noopener noreferrer" 
-                                             className="text-blue-600 hover:underline">
-                                            {competitor.socialMedia}
-                                          </a>
-                                        </div>
-                                      )}
-                                      {competitor.linkedin && (
-                                        <div>
-                                          <span className="font-medium">LinkedIn: </span>
-                                          <a href={competitor.linkedin} target="_blank" rel="noopener noreferrer" 
-                                             className="text-blue-600 hover:underline">
-                                            {competitor.linkedin}
-                                          </a>
-                                        </div>
-                                      )}
-                                      {competitor.website && (
-                                        <div>
-                                          <span className="font-medium">Website: </span>
-                                          <a href={competitor.website} target="_blank" rel="noopener noreferrer" 
-                                             className="text-blue-600 hover:underline">
-                                            {competitor.website}
-                                          </a>
-                                        </div>
-                                      )}
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                      <div>
+                                        <label className="text-sm font-medium mb-1 block">Rakip Adı</label>
+                                        <Input
+                                          value={competitor.name}
+                                          onChange={(e) => updateCompetitor(competitor.id, 'name', e.target.value)}
+                                          placeholder="Rakip adını girin..."
+                                        />
+                                      </div>
+                                      <div>
+                                        <label className="text-sm font-medium mb-1 block">Sosyal Medya Adresi</label>
+                                        <Input
+                                          value={competitor.socialMedia}
+                                          onChange={(e) => updateCompetitor(competitor.id, 'socialMedia', e.target.value)}
+                                          placeholder="Sosyal medya linki..."
+                                        />
+                                      </div>
+                                      <div>
+                                        <label className="text-sm font-medium mb-1 block">LinkedIn Adresi</label>
+                                        <Input
+                                          value={competitor.linkedin}
+                                          onChange={(e) => updateCompetitor(competitor.id, 'linkedin', e.target.value)}
+                                          placeholder="LinkedIn profil linki..."
+                                        />
+                                      </div>
+                                      <div>
+                                        <label className="text-sm font-medium mb-1 block">Web Adresi</label>
+                                        <Input
+                                          value={competitor.website}
+                                          onChange={(e) => updateCompetitor(competitor.id, 'website', e.target.value)}
+                                          placeholder="Website URL'si..."
+                                        />
+                                      </div>
                                     </div>
                                   </div>
                                 ))}
