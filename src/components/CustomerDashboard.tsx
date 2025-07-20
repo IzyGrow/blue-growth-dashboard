@@ -640,7 +640,7 @@ export default function CustomerDashboard() {
               <div>
                 <h1 className="text-3xl font-bold mb-2">izyGrow AI Agent Büyüme Hizmetleri</h1>
                 <p className="text-primary-foreground/90">
-                  {subscriptionInfo.customerName} tarafından açılmıştır
+                  Kullanıcı: İntime Mimarlık
                 </p>
                 <p className="text-primary-foreground/70 text-sm">AI Destekli Büyüme Stratejileri</p>
               </div>
