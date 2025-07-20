@@ -155,6 +155,35 @@ export default function CustomerDashboard() {
     longTerm: ['']
   });
 
+  // Hedef Kitle Analizi için state'ler
+  const [targetAnalysisData, setTargetAnalysisData] = useState({
+    services: [
+      {
+        id: 1,
+        name: '',
+        targetGroups: [
+          {
+            id: 1,
+            ageRange: '',
+            location: '',
+            education: '',
+            interests: '',
+            persona: {
+              name: '',
+              bio: '',
+              profession: '',
+              hasChildren: '',
+              residence: '',
+              likes: '',
+              painPoints: '',
+              motivations: ''
+            }
+          }
+        ]
+      }
+    ]
+  });
+
   const addSwotItem = (category: keyof typeof swotData) => {
     setSwotData(prev => ({
       ...prev,
@@ -180,6 +209,103 @@ export default function CustomerDashboard() {
     setGoalsData(prev => ({
       ...prev,
       [category]: prev[category].map((item, i) => i === index ? value : item)
+    }));
+  };
+
+  // Target Analysis helper functions
+  const addService = () => {
+    const newId = Math.max(...targetAnalysisData.services.map(s => s.id)) + 1;
+    setTargetAnalysisData(prev => ({
+      ...prev,
+      services: [...prev.services, {
+        id: newId,
+        name: '',
+        targetGroups: [{
+          id: 1,
+          ageRange: '',
+          location: '',
+          education: '',
+          interests: '',
+          persona: {
+            name: '',
+            bio: '',
+            profession: '',
+            hasChildren: '',
+            residence: '',
+            likes: '',
+            painPoints: '',
+            motivations: ''
+          }
+        }]
+      }]
+    }));
+  };
+
+  const updateServiceName = (serviceId: number, name: string) => {
+    setTargetAnalysisData(prev => ({
+      ...prev,
+      services: prev.services.map(service => 
+        service.id === serviceId ? { ...service, name } : service
+      )
+    }));
+  };
+
+  const updateTargetGroup = (serviceId: number, groupId: number, field: string, value: string) => {
+    setTargetAnalysisData(prev => ({
+      ...prev,
+      services: prev.services.map(service => 
+        service.id === serviceId ? {
+          ...service,
+          targetGroups: service.targetGroups.map(group =>
+            group.id === groupId ? { ...group, [field]: value } : group
+          )
+        } : service
+      )
+    }));
+  };
+
+  const updatePersona = (serviceId: number, groupId: number, field: string, value: string) => {
+    setTargetAnalysisData(prev => ({
+      ...prev,
+      services: prev.services.map(service => 
+        service.id === serviceId ? {
+          ...service,
+          targetGroups: service.targetGroups.map(group =>
+            group.id === groupId ? { 
+              ...group, 
+              persona: { ...group.persona, [field]: value }
+            } : group
+          )
+        } : service
+      )
+    }));
+  };
+
+  const addTargetGroup = (serviceId: number) => {
+    setTargetAnalysisData(prev => ({
+      ...prev,
+      services: prev.services.map(service => 
+        service.id === serviceId ? {
+          ...service,
+          targetGroups: [...service.targetGroups, {
+            id: Math.max(...service.targetGroups.map(g => g.id)) + 1,
+            ageRange: '',
+            location: '',
+            education: '',
+            interests: '',
+            persona: {
+              name: '',
+              bio: '',
+              profession: '',
+              hasChildren: '',
+              residence: '',
+              likes: '',
+              painPoints: '',
+              motivations: ''
+            }
+          }]
+        } : service
+      )
     }));
   };
 
@@ -693,8 +819,174 @@ export default function CustomerDashboard() {
                       </div>
                     )}
 
+                    {/* Hedef Kitle Analizi */}
+                    {item.id === 'target' && (
+                      <div className="space-y-6">
+                        {/* Hizmetler Bölümü */}
+                        <div className="space-y-4">
+                          <div className="flex items-center justify-between">
+                            <h4 className="font-semibold text-primary">Hizmetler</h4>
+                            <Button onClick={addService} variant="outline" size="sm">
+                              <Plus className="h-4 w-4 mr-2" />
+                              Hizmet Ekle
+                            </Button>
+                          </div>
+
+                          {targetAnalysisData.services.map((service) => (
+                            <div key={service.id} className="p-4 border rounded-lg space-y-4">
+                              {/* Hizmet Adı */}
+                              <Input
+                                value={service.name}
+                                onChange={(e) => updateServiceName(service.id, e.target.value)}
+                                placeholder="Hizmet adını girin..."
+                                className="font-medium"
+                              />
+
+                              {/* Hedef Gruplar */}
+                              <div className="space-y-4">
+                                <div className="flex items-center justify-between">
+                                  <h5 className="font-medium">Hedef Gruplar</h5>
+                                  <Button 
+                                    onClick={() => addTargetGroup(service.id)} 
+                                    variant="outline" 
+                                    size="sm"
+                                  >
+                                    <Plus className="h-4 w-4 mr-2" />
+                                    Hedef Grup Ekle
+                                  </Button>
+                                </div>
+
+                                {service.targetGroups.map((group) => (
+                                  <div key={group.id} className="p-4 bg-muted/30 rounded-lg space-y-4">
+                                    {/* Hedef Grup Bilgileri */}
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                      <div>
+                                        <label className="text-sm font-medium mb-1 block">Yaş Aralığı</label>
+                                        <Input
+                                          value={group.ageRange}
+                                          onChange={(e) => updateTargetGroup(service.id, group.id, 'ageRange', e.target.value)}
+                                          placeholder="Örn: 25-35"
+                                          className="text-sm"
+                                        />
+                                      </div>
+                                      <div>
+                                        <label className="text-sm font-medium mb-1 block">Lokasyon</label>
+                                        <Input
+                                          value={group.location}
+                                          onChange={(e) => updateTargetGroup(service.id, group.id, 'location', e.target.value)}
+                                          placeholder="Örn: İstanbul, Ankara"
+                                          className="text-sm"
+                                        />
+                                      </div>
+                                      <div>
+                                        <label className="text-sm font-medium mb-1 block">Eğitim Durumu</label>
+                                        <Input
+                                          value={group.education}
+                                          onChange={(e) => updateTargetGroup(service.id, group.id, 'education', e.target.value)}
+                                          placeholder="Örn: Üniversite mezunu"
+                                          className="text-sm"
+                                        />
+                                      </div>
+                                      <div>
+                                        <label className="text-sm font-medium mb-1 block">İlgi Alanları</label>
+                                        <Input
+                                          value={group.interests}
+                                          onChange={(e) => updateTargetGroup(service.id, group.id, 'interests', e.target.value)}
+                                          placeholder="Örn: Teknoloji, spor"
+                                          className="text-sm"
+                                        />
+                                      </div>
+                                    </div>
+
+                                    {/* Persona Bilgileri */}
+                                    <div className="mt-4">
+                                      <h6 className="font-medium mb-3 text-purple-600">Persona Bilgileri</h6>
+                                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                        <div>
+                                          <label className="text-sm font-medium mb-1 block">Adı</label>
+                                          <Input
+                                            value={group.persona.name}
+                                            onChange={(e) => updatePersona(service.id, group.id, 'name', e.target.value)}
+                                            placeholder="Örn: Ayşe Kaya"
+                                            className="text-sm"
+                                          />
+                                        </div>
+                                        <div>
+                                          <label className="text-sm font-medium mb-1 block">Mesleği</label>
+                                          <Input
+                                            value={group.persona.profession}
+                                            onChange={(e) => updatePersona(service.id, group.id, 'profession', e.target.value)}
+                                            placeholder="Örn: Pazarlama Müdürü"
+                                            className="text-sm"
+                                          />
+                                        </div>
+                                        <div>
+                                          <label className="text-sm font-medium mb-1 block">Çocuğu var mı?</label>
+                                          <Input
+                                            value={group.persona.hasChildren}
+                                            onChange={(e) => updatePersona(service.id, group.id, 'hasChildren', e.target.value)}
+                                            placeholder="Örn: Evet, 2 çocuk"
+                                            className="text-sm"
+                                          />
+                                        </div>
+                                        <div>
+                                          <label className="text-sm font-medium mb-1 block">Nerede yaşıyor</label>
+                                          <Input
+                                            value={group.persona.residence}
+                                            onChange={(e) => updatePersona(service.id, group.id, 'residence', e.target.value)}
+                                            placeholder="Örn: İstanbul, Kadıköy"
+                                            className="text-sm"
+                                          />
+                                        </div>
+                                        <div className="md:col-span-2">
+                                          <label className="text-sm font-medium mb-1 block">Bio</label>
+                                          <Input
+                                            value={group.persona.bio}
+                                            onChange={(e) => updatePersona(service.id, group.id, 'bio', e.target.value)}
+                                            placeholder="Kısa biyografi..."
+                                            className="text-sm"
+                                          />
+                                        </div>
+                                        <div className="md:col-span-2">
+                                          <label className="text-sm font-medium mb-1 block">Nelerden hoşlanıyor</label>
+                                          <Input
+                                            value={group.persona.likes}
+                                            onChange={(e) => updatePersona(service.id, group.id, 'likes', e.target.value)}
+                                            placeholder="Örn: Kitap okuma, seyahat"
+                                            className="text-sm"
+                                          />
+                                        </div>
+                                        <div className="md:col-span-2">
+                                          <label className="text-sm font-medium mb-1 block">Acı noktaları neler</label>
+                                          <Input
+                                            value={group.persona.painPoints}
+                                            onChange={(e) => updatePersona(service.id, group.id, 'painPoints', e.target.value)}
+                                            placeholder="Örn: Zaman eksikliği, stres"
+                                            className="text-sm"
+                                          />
+                                        </div>
+                                        <div className="md:col-span-2">
+                                          <label className="text-sm font-medium mb-1 block">Motivasyon kaynakları neler</label>
+                                          <Input
+                                            value={group.persona.motivations}
+                                            onChange={(e) => updatePersona(service.id, group.id, 'motivations', e.target.value)}
+                                            placeholder="Örn: Kariyer gelişimi, aile"
+                                            className="text-sm"
+                                          />
+                                        </div>
+                                      </div>
+                                    </div>
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
                     {/* Diğer analiz bölümleri için varsayılan görünüm */}
-                    {item.id !== 'swot' && item.id !== 'goals' && item.files.length === 0 && (
+                    {item.id !== 'swot' && item.id !== 'goals' && item.id !== 'target' && item.files.length === 0 && (
                       <div className="text-center py-8 text-muted-foreground">
                         <div className="flex items-center justify-center gap-2 mb-2">
                           <Calendar className="h-4 w-4" />
