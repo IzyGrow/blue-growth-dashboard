@@ -1360,8 +1360,8 @@ export default function CustomerDashboard() {
                       </div>
                     )}
 
-                    {/* İnternet Sitesi Analizi için özel dosya yükleme alanı */}
-                    {item.id === 'website' && (
+                    {/* İnternet Sitesi Analizi ve Marka Analizi için özel dosya yükleme alanı */}
+                    {(item.id === 'website' || item.id === 'brand') && (
                       <div className="space-y-4">
                         <div className="border-2 border-dashed border-muted-foreground/25 rounded-lg p-8 text-center">
                           <div className="flex flex-col items-center gap-4">
@@ -1371,7 +1371,7 @@ export default function CustomerDashboard() {
                             <div>
                               <h3 className="text-lg font-medium mb-2">Dosya Yükle</h3>
                               <p className="text-muted-foreground mb-4">
-                                İnternet sitesi analizi için dosyalarınızı buraya yükleyin
+                                {item.id === 'website' ? 'İnternet sitesi analizi' : 'Marka analizi'} için dosyalarınızı buraya yükleyin
                               </p>
                               <Input 
                                 type="file" 
@@ -1401,7 +1401,7 @@ export default function CustomerDashboard() {
                           <Card>
                             <CardHeader>
                               <CardTitle>Yüklenen Dosyalar</CardTitle>
-                              <CardDescription>İnternet sitesi analizi için yüklenen dosyalar</CardDescription>
+                              <CardDescription>{item.id === 'website' ? 'İnternet sitesi analizi' : 'Marka analizi'} için yüklenen dosyalar</CardDescription>
                             </CardHeader>
                             <CardContent>
                               <div className="space-y-3">
@@ -1445,7 +1445,7 @@ export default function CustomerDashboard() {
                     )}
 
                     {/* Diğer analiz bölümleri için varsayılan görünüm */}
-                    {item.id !== 'swot' && item.id !== 'goals' && item.id !== 'target' && item.id !== 'competitor' && item.id !== 'website' && item.files.length === 0 && (
+                    {item.id !== 'swot' && item.id !== 'goals' && item.id !== 'target' && item.id !== 'competitor' && item.id !== 'website' && item.id !== 'brand' && item.files.length === 0 && (
                       <div className="text-center py-8 text-muted-foreground">
                         <div className="flex items-center justify-center gap-2 mb-2">
                           <Calendar className="h-4 w-4" />
